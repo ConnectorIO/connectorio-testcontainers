@@ -17,6 +17,7 @@
  */
 package org.connectorio.testcontainers.openhab.std;
 
+import java.util.Collections;
 import java.util.Set;
 import org.connectorio.testcontainers.karaf.Customization;
 import org.connectorio.testcontainers.karaf.KarafBasedContainer;
@@ -39,7 +40,7 @@ public class UserAccountCustomization implements Customization {
 
   @Override
   public Set<Class<? extends Customization>> getDependencies() {
-    return null;
+    return Collections.emptySet();
   }
 
   @Override

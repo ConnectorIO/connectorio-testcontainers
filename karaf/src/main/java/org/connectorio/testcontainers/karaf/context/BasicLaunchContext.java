@@ -38,7 +38,8 @@ public class BasicLaunchContext implements LaunchContext {
       if (isPartOfDependencyChain(o2, o1.getDependencies())) {
         return 1;
       }
-      return 0;
+      // equal in case of set might trigger removal of element
+      return -1;
     }
 
     @Nullable

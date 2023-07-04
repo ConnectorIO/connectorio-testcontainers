@@ -59,8 +59,9 @@ public class UserApiTokenCustomization implements Customization {
     Matcher matcher = pattern.matcher(result.getStdout());
     if (matcher.find()) {
       this.apiToken = matcher.group(1);
+    } else {
+      throw new IllegalArgumentException("Could not determine admin access token");
     }
-    throw new IllegalArgumentException("Could not determine admin access token");
   }
 
   public String getApiToken() {
