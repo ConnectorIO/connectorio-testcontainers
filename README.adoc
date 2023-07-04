@@ -1,0 +1,39 @@
+= ConnectorIO + TestContainers
+
+This repository integrates https://github.com/testcontainers/testcontainers-java[testcontainers-java] and https://karaf.apache.org[Apache Karaf] docker image.
+It is a lightweight (if you take docker out of picture) alternative to traditional pax-exam tests.
+Main advantage of testcontainers is possibility to integrate with junit5 ecosystem.
+With junit5 and testcontainers all modern testing capabilities can be employed to improve quality assurance of solutions based on Apache Karaf.
+
+== Usage
+
+In order to conduct your tests, use standard testcontainers structure, i.e.:
+[source,java]
+----
+include::karaf/src/test/java/org/connectorio/testcontainers/karaf/KarafContainerTest.java[]
+----
+
+Since applications deployed in wild have various behaviors and options karaf test container implementation supports concept of a `Customization`.
+The `Customization` can be seen as both - a pax-exam option but also capability (i.e. initialized http client to call deployed REST api).
+Above example includes `ShellCustomization` which allows to open a ssh shell session.
+It does also include `KarafUserCustomization` which injects an admin user.
+
+You can implement your own `Customization` which reflect specifics of your distribution.
+Each `Customization` needs to be registered before container start.
+Customization is bound to container lifecycle and can declare dependencies which allows to adjust startup order of all customizations:
+[source,java]
+----
+include::karaf/src/main/java/org/connectorio/testcontainers/karaf/Customization.java[]
+----
+
+=== License
+
+Code in this repository is licensed under Apache Software License v2 (ASLv2).
+Copy of license is included in this repository, see `LICENSE` file.
+
+=== Trademarks
+
+The ConnectorIO(R) is a trademark of and licensed by Code-House, Łukasz Dywicki.
+
+Apache Karaf, Karaf, Apache, the Apache feather logo, and the Apache Karaf project logo are trademarks of The Apache Software Foundation.
+There is no affiliation of any kind between ConnectorIO and Apache Software Foundation.
