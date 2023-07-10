@@ -1,0 +1,53 @@
+name: Maven release
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: "Release version."
+        required: true
+        default: "X.Y.Z"
+      developmentVersion:
+        description: "Version to which working copy should be set after release."
+        required: true
+        default: "X.Y.Z-SNAPSHOT"
+      dryRun:
+        description: "Should release be done in dry-run mode."
+        required: true
+        default: "true"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup git
+        run: |
+          git config user.email "ci@connectorio.com"
+          git config user.name "ConnectorIO Bot"
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          server-id: sonatype-nexus-staging
+          server-username: CI_RELEASE_USERNAME
+          server-password: CI_RELEASE_PASSWORD
+          gpg-passphrase: GPG_PASSPHRASE
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+      - name: Maven Release
+        run: >-
+          mvn -B
+          release:prepare -DpreparationProfiles=release
+          release:perform -DreleaseProfiles=release
+          -DreleaseVersion=${{ inputs.releaseVersion }}
+          -DdevelopmentVersion=${{ inputs.developmentVersion }}
+          -DdryRun=${{ inputs.dryRun }}
+        env:
+          CI_RELEASE_USERNAME: ${{ secrets.CI_RELEASE_USERNAME }}
+          CI_RELEASE_PASSWORD: ${{ secrets.CI_RELEASE_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          mvn -B release:rollback
+          echo "You may need to manually delete the git tag, if it was created."
