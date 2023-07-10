@@ -29,7 +29,7 @@
 
   <groupId>org.connectorio</groupId>
   <artifactId>testcontainers</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <packaging>pom</packaging>
 
   <name>ConnectorIO - Test Containers</name>
@@ -45,7 +45,7 @@
     <connection>scm:git:git@github.com:ConnectorIO/connectorio-testcontainers.git</connection>
     <developerConnection>scm:git:git@github.com:ConnectorIO/connectorio-testcontainers.git</developerConnection>
     <url>https://github.com/ConnectorIO/connectorio-testcontainers</url>
-    <tag>HEAD</tag>
+    <tag>testcontainers-0.1.0</tag>
   </scm>
 
   <licenses>
