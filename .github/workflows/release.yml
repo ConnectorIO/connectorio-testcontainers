@@ -19,12 +19,18 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - name: Setup git
         run: |
           git config user.email "ci@connectorio.com"
           git config user.name "ConnectorIO Bot"
+          git config --global url."https://${BUILD_USER}:${BUILD_TOKEN}@github.com/".insteadOf "git@github.com:"
+        env:
+          BUILD_USER: x-access-token
+          BUILD_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -34,14 +40,25 @@ jobs:
           server-password: CI_RELEASE_PASSWORD
           gpg-passphrase: GPG_PASSPHRASE
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-      - name: Maven Release
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Maven Prepare Release
         run: >-
           mvn -B
           release:prepare -DpreparationProfiles=release
-          release:perform -DreleaseProfiles=release
           -DreleaseVersion=${{ inputs.releaseVersion }}
           -DdevelopmentVersion=${{ inputs.developmentVersion }}
           -DdryRun=${{ inputs.dryRun }}
+      - name: Maven Perform Release
+        if: success()
+        run: >-
+          mvn -B
+          release:perform -DreleaseProfiles=release
         env:
           CI_RELEASE_USERNAME: ${{ secrets.CI_RELEASE_USERNAME }}
           CI_RELEASE_PASSWORD: ${{ secrets.CI_RELEASE_PASSWORD }}
